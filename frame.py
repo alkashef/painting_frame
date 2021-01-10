@@ -45,7 +45,6 @@ def add_margin(pil_img, top, right, bottom, left, frame_style):
     font_size = int(bottom * config['font_ratio'])
     if font_size < min_font:
         font_size = min_font
-    #print(font_size)
     
     frame_style['font'] = ImageFont.truetype('arial.ttf', size = font_size)
     frame_style['bold'] = ImageFont.truetype('arialbd.ttf', size = font_size + 1)
@@ -64,19 +63,37 @@ def add_text(artwork, label, frame_style, bottom):
     
     top1 = int(artwork.height - (bottom * config['label_in_bottom']))
     line1 = label['artist']
-    draw.text((left, top1), line1, fill = text_color, font = bold)
+    if line1 != "":
+        draw.text((left, top1), line1, fill = text_color, font = bold)
     
     top2 = top1 + vspace
-    line2 = label['title'] + ' (' + label['date'] + ')' 
-    draw.text((left, top2), line2, fill = text_color, font = bold)
+    if (label['title'] != "") and (label['date'] != ""):
+        line2 = label['title'] + ' (' + label['date'] + ')'
+    elif (label['title'] != "") and (label['date'] == ""):
+        line2 = label['title']
+    elif (label['title'] == "") and (label['date'] != ""):
+        line2 = label['date']
+    else:
+        line2 = ""
+    if line2 != "":
+        draw.text((left, top2), line2, fill = text_color, font = bold)
 
     top3 = top2 + vspace
-    line3 = label['material'] + ', ' + label['size']
-    draw.text((left, top3), line3, fill = text_color, font = font)
+    if (label['material'] != "") and (label['size'] == ""):
+        line3 = label['material']
+    elif (label['material'] == "") and (label['size'] != ""):
+        line3 = label['size']
+    elif (label['material'] != "") and (label['size'] != ""):
+        line3 = label['material'] + ', ' +  label['size']
+    else:
+        line3 = ""
+    if line3 != "":    
+        draw.text((left, top3), line3, fill = text_color, font = font)
 
     top4 = top3 + vspace
     line4 = label['comment']
-    draw.text((left, top4), line4, fill = text_color, font = font)
+    if line4 != "":
+        draw.text((left, top4), line4, fill = text_color, font = font)
     
     return artwork
 
@@ -91,7 +108,7 @@ def frame(uploaded, label, frame_style):
         top = right
     else:
         right = top
-    left = int(img.size[0] * r)
+    left = right
     bottom = int(top * 2)
     
     framed, bottom = add_margin(img, top, right , bottom, left, frame_style)
@@ -123,12 +140,12 @@ date     = st.sidebar.text_input("Date")
 comment  = st.sidebar.text_input("Comment")
 
 label = {
-    'artist'    : artist,
-    'title'     : title,
-    'material'  : material,
-    'size'      : size,
-    'date'      : date,
-    'comment'   : comment
+    'artist'    : artist.strip(),
+    'title'     : title.strip(),
+    'material'  : material.strip(),
+    'size'      : size.strip(),
+    'date'      : date.strip(),
+    'comment'   : comment.strip()
 }
 
 # Frame
@@ -157,3 +174,4 @@ if (clicked) and (uploaded is not None):
     framed.close()
     message = "Framed picture saved to " + saved_file
     st.success(message)
+
