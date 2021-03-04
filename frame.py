@@ -13,10 +13,12 @@ subtitle = "Frame a picture of your art work and add a label."
 black = (0  , 0  , 0)
 white = (255, 255, 255)
 grey  = (170, 170, 170)
+red   = (178, 34,  34)
 
 frame_style_dark  = {'frame_color' : black, 'text_color' : white}
 frame_style_light = {'frame_color' : white, 'text_color' : black}
 frame_style_grey  = {'frame_color' : grey,  'text_color' : black}
+frame_style_red   = {'frame_color' : red,   'text_color' : white}
 
 config = {'min_bottom'      : 200,
           'min_font'        : 12,
@@ -133,13 +135,15 @@ label = {
 
 # Frame
 st.sidebar.subheader("Frame")
-frame_selection = st.sidebar.selectbox('', ['Dark', 'Light', 'Grey'])
+frame_selection = st.sidebar.selectbox('', ['Dark', 'Light', 'Grey', 'Red'])
 if frame_selection == 'Dark':
     frame_style = frame_style_dark
 elif frame_selection == 'Light':
     frame_style = frame_style_light
 elif frame_selection == 'Grey':
     frame_style = frame_style_grey
+elif frame_selection == 'Red':
+    frame_style = frame_style_red
 
 # Framed Picture
 framed = None
