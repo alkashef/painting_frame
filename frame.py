@@ -1,35 +1,8 @@
 
-# Preamble
 import streamlit as st
 import os
 from PIL import Image, ImageFont, ImageDraw
 
-#------------------------------------------------------------------------------
-
-# Constants
-title = "Art Work Picture Frame"
-subtitle = "Frame a picture of your art work and add a label."
-
-black = (0  , 0  , 0)
-white = (255, 255, 255)
-grey  = (170, 170, 170)
-red   = (178, 34,  34)
-
-frame_style_dark  = {'frame_color' : black, 'text_color' : white}
-frame_style_light = {'frame_color' : white, 'text_color' : black}
-frame_style_grey  = {'frame_color' : grey,  'text_color' : black}
-frame_style_red   = {'frame_color' : red,   'text_color' : white}
-
-config = {'min_bottom'      : 200,
-          'min_font'        : 12,
-          'font_ratio'      : 0.07,
-          'frame_ratio'     : 0.1,
-          'label_in_bottom' : 0.66,
-          'label_vspace'    : 9}
-
-thumbnail_width = 285
-
-#------------------------------------------------------------------------------
 
 def add_margin(pil_img, top, right, bottom, left, frame_style):
     width, height = pil_img.size
@@ -52,6 +25,7 @@ def add_margin(pil_img, top, right, bottom, left, frame_style):
     frame_style['bold'] = ImageFont.truetype('arialbd.ttf', size = font_size + 1)
     
     return result, bottom
+
 
 def add_text(artwork, label, frame_style, bottom):
     draw = ImageDraw.Draw(artwork)
@@ -86,7 +60,7 @@ def add_text(artwork, label, frame_style, bottom):
     elif (label['material'] == "") and (label['size'] != ""):
         line3 = label['size']
     elif (label['material'] != "") and (label['size'] != ""):
-        line3 = label['material'] + ', ' +  label['size']
+        line3 = label['material'] + ', ' + label['size']
     else:
         line3 = ""
     if line3 != "":    
@@ -98,6 +72,7 @@ def add_text(artwork, label, frame_style, bottom):
         draw.text((left, top4), line4, fill = text_color, font = font)
     
     return artwork
+
 
 def frame(uploaded, label, frame_style):
     img = Image.open(uploaded)
@@ -118,64 +93,89 @@ def frame(uploaded, label, frame_style):
     
     return framed_labeled
 
-#------------------------------------------------------------------------------
 
-# Headers
-st.title(title)
-st.text(subtitle)
+def app():
 
-# Picture
-st.sidebar.subheader("Picture")
-uploaded = st.sidebar.file_uploader("")
-if (uploaded is not None):
-    thumbnail_image = Image.open(uploaded) #.thumbnail(thumbnail_size)
-    st.sidebar.image(thumbnail_image, width=thumbnail_width, caption='Thumbnail of the Loaded Picture')
+    # Constants
+    title = "Picture Frame"
+    subtitle = "Frame a picture of an artwork and add a label."
 
-# Label
-st.sidebar.subheader("Label")
+    black = (0  , 0  , 0)
+    white = (255, 255, 255)
+    grey  = (170, 170, 170)
+    red   = (178, 34,  34)
 
-artist   = st.sidebar.text_input("Artist")
-title    = st.sidebar.text_input("Title")
-material = st.sidebar.text_input("Material")
-size     = st.sidebar.text_input("Size")
-date     = st.sidebar.text_input("Date")
-comment  = st.sidebar.text_input("Comment")
+    frame_style_dark  = {'frame_color' : black, 'text_color' : white}
+    frame_style_light = {'frame_color' : white, 'text_color' : black}
+    frame_style_grey  = {'frame_color' : grey,  'text_color' : black}
+    frame_style_red   = {'frame_color' : red,   'text_color' : white}
 
-label = {
-    'artist'    : artist.strip(),
-    'title'     : title.strip(),
-    'material'  : material.strip(),
-    'size'      : size.strip(),
-    'date'      : date.strip(),
-    'comment'   : comment.strip()
-}
+    config = {'min_bottom'      : 200,
+            'min_font'        : 12,
+            'font_ratio'      : 0.07,
+            'frame_ratio'     : 0.1,
+            'label_in_bottom' : 0.66,
+            'label_vspace'    : 9}
 
-# Frame
-st.sidebar.subheader("Frame")
-frame_selection = st.sidebar.selectbox('', ['Dark', 'Light', 'Grey', 'Red'])
-if frame_selection == 'Dark':
-    frame_style = frame_style_dark
-elif frame_selection == 'Light':
-    frame_style = frame_style_light
-elif frame_selection == 'Grey':
-    frame_style = frame_style_grey
-elif frame_selection == 'Red':
-    frame_style = frame_style_red
+    thumbnail_width = 285
 
-# Framed Picture
-framed = None
-clicked = st.sidebar.button("Frame and Label")
-if (clicked) and (uploaded is not None):
-    framed = frame(uploaded, label, frame_style)
-    
-    # Display result
-    #copy = framed.copy()
-    st.image(framed, caption='', use_column_width=True)
-    
-    # Save framed picture
-    saved_file = (uploaded.name.split('.')[0] + " - Framed." + uploaded.name.split('.')[1])
-    framed.save(saved_file, quality=100)
-    framed.close()
-    message = "Framed picture saved to " + saved_file
-    st.success(message)
+    col_left, col_right = st.beta_columns((1, 3))
 
+    # Headers
+    col_right.title(title)
+    col_right.text(subtitle)
+
+    # Picture
+    col_left.subheader("Picture")
+    uploaded = col_left.file_uploader("")
+    if (uploaded is not None):
+        thumbnail_image = Image.open(uploaded) #.thumbnail(thumbnail_size)
+        col_left.image(thumbnail_image, width=thumbnail_width, caption='Thumbnail of the Loaded Picture')
+
+    # Label
+    col_left.subheader("Label")
+
+    artist   = col_left.text_input("Artist")
+    title    = col_left.text_input("Title")
+    material = col_left.text_input("Material")
+    size     = col_left.text_input("Size")
+    date     = col_left.text_input("Date")
+    comment  = col_left.text_input("Comment")
+
+    label = {
+        'artist'    : artist.strip(),
+        'title'     : title.strip(),
+        'material'  : material.strip(),
+        'size'      : size.strip(),
+        'date'      : date.strip(),
+        'comment'   : comment.strip()
+    }
+
+    # Frame
+    col_left.subheader("Frame")
+    frame_selection = col_left.selectbox('', ['Dark', 'Light', 'Grey', 'Red'])
+    if frame_selection == 'Dark':
+        frame_style = frame_style_dark
+    elif frame_selection == 'Light':
+        frame_style = frame_style_light
+    elif frame_selection == 'Grey':
+        frame_style = frame_style_grey
+    elif frame_selection == 'Red':
+        frame_style = frame_style_red
+
+    # Framed Picture
+    framed = None
+    clicked = col_left.button("Frame and Label")
+    if (clicked) and (uploaded is not None):
+        framed = frame(uploaded, label, frame_style)
+        
+        # Display result
+        #copy = framed.copy()
+        col_right.image(framed, caption='', use_column_width=True)
+        
+        # Save framed picture
+        saved_file = (uploaded.name.split('.')[0] + " - Framed." + uploaded.name.split('.')[1])
+        framed.save(saved_file, quality=100)
+        framed.close()
+        message = "Framed picture saved to " + saved_file
+        col_right.success(message)
